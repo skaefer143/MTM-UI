@@ -3,35 +3,48 @@ import SongInfo from './SongInfo';
 import SongRanking from './SongRanking';
 import SongMedia from './SongMedia';
 import { MusicAPI } from '../api/mtm.js';
+import { Song } from '../entities/Song.js';
+import { SongRank } from '../entities/SongRank.js';
 
-export default class Song extends React.Component {
-    
+export default class SongPage extends React.Component {
+
     state = {
         song: {},
         rankings: [],
         media: [],
-        isLoading: false
+        isLoadingInfo: false,
+        isLoadingRankings: false,
+        isLoadingMedia: false,
     };
 
-    componentDidMount() {  
+    componentDidMount() {
+        this.setState({
+            isLoadingInfo: true,
+            isLoadingRankings: true,
+            isLoadingMedia: true,
+        });
+
         let songId = this.props.match.params.id;
 
-        this.loadSongInfo(songId);
-        this.loadSongRankings(songId);
-        this.loadSongMedia(songId);
+        setTimeout(() => {
+            this.loadSongInfo(songId);
+            this.loadSongRankings(songId);
+            this.loadSongMedia(songId);
+        }, 0);
+        
     };
 
     loadSongInfo(songId) {
         MusicAPI.getSongInfo(songId).then(function (data) {
             this.setState({
                 song: data,
-                isLoading: false
+                isLoadingInfo: false
             });
         }.bind(this), function (e) {
             this.setState({
-            isLoading: false,
-            errorMessage: e.message
+                isLoadingInfo: false
             });
+            alert(e.message);
         }.bind(this));
     };
 
@@ -39,13 +52,13 @@ export default class Song extends React.Component {
         MusicAPI.getSongRankings(songId).then(function (data) {
             this.setState({
                 rankings: data,
-                isLoading: false
+                isLoadingRankings: false
             });
         }.bind(this), function (e) {
             this.setState({
-            isLoading: false,
-            errorMessage: e.message
+                isLoadingRankings: false
             });
+            alert(e.message);
         }.bind(this));
     };
 
@@ -53,26 +66,30 @@ export default class Song extends React.Component {
         MusicAPI.getSongMedia(songId).then(function (data) {
             this.setState({
                 media: data,
-                isLoading: false
+                isLoadingMedia: false
             });
         }.bind(this), function (e) {
             this.setState({
-            isLoading: false,
-            errorMessage: e.message
+                isLoadingMedia: false
             });
+            alert(e.message);
         }.bind(this));
     };
 
     render() {
         let songId = this.props.match.params.id;
-        
 
         return (
             <div className="container">
                 <div className="row">
                     <div className="col-lg-12 text-center">
                         <div className="container">
-                            <br />
+                            { 
+                                (this.state.isLoadingInfo && 
+                                this.state.isLoadingRankings && 
+                                this.state.isLoadingMedia)? 
+                                <p>Loading...</p> : <br />   
+                            }
                             <SongInfo song={this.state.song} />
                             <SongRanking rankings={this.state.rankings} />
                             <SongMedia media={this.state.media} />

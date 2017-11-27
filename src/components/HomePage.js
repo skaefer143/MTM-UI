@@ -24,11 +24,11 @@ export default class HomePage extends React.Component {
               isLoading: false
           });
       }.bind(this), function (e) {
-        console.log(e);
           this.setState({
-          isLoading: false,
-          errorMessage: e.message
+          isLoading: false
           });
+
+          alert(e.message);
       }.bind(this));
   };
 
@@ -47,8 +47,8 @@ export default class HomePage extends React.Component {
     });
     
     if (!this.state.date.isValid()) {
-      //throw new Error("Invalid date");  
-      //return;
+      alert("Invalid date");  
+      return;
     }
 
     this.loadChart(this.state.date.format(dateFormat));

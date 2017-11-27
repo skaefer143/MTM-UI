@@ -4,7 +4,7 @@ import NotFoundPage from '../components/NotFoundPage';
 import Header from '../components/Header';
 import HomePage from '../components/HomePage';
 import About from '../components/About';
-import Song from '../components/Song';
+import SongPage from '../components/SongPage';
 
 const AppRouter = () => (
   <BrowserRouter>
@@ -12,7 +12,7 @@ const AppRouter = () => (
       <Header />
       <Switch>
         <Route path="/" component={HomePage} exact={true} />
-        <Route path="/song/:id" component={Song} />
+        <Route path="/song/:id" component={SongPage} />
         <Route path="/about" component={About} />
         <Route component={NotFoundPage} />
       </Switch>

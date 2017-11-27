@@ -1,5 +1,9 @@
 import moment from 'moment';
 import axios from 'axios';
+import { Song } from '../entities/Song.js';
+import { SongRank } from '../entities/SongRank.js';
+import { MediaItem } from '../entities/MediaItem.js';
+import { ChartPosition } from '../entities/ChartPosition.js';
 
 const BASE_URL = "http://localhost:8888/api";
 
@@ -9,122 +13,100 @@ class MusicAPI {
 
     }
 
+    static handleError = (error) => {
+        var message = "Unreachable server error";
+        if (error.response.data.errors[0] != undefined) {
+            message = error.response.data.errors[0].details;
+        }
+
+        throw new Error(message);
+    };
+
     static getChart = (date) => {
 
         let requestUrl = BASE_URL + "/charts/" + date;
-        
-        return axios.get(requestUrl).then(function (res) {
 
-            let result = res.data.data;
+        return axios.get(requestUrl)
+            .then(function (res) {
 
-            let chart = [];
-            
-            result.forEach((chartItem) => { chart.push(
-                { 
-                    position: chartItem.rank, 
-                    id: chartItem.songId,
-                    name: chartItem['song.name'],
-                    artist: chartItem['song.artist']
-                }); 
+                let result = res.data.data;
+
+                let chart = [];
+
+                result.forEach((chartItem) => {
+                    chart.push(new ChartPosition(chartItem.rank, chartItem.songId, chartItem['song.name'], chartItem['song.artist']));
+                });
+
+                return chart;
+
+            })
+            .catch(function (error) {
+                MusicAPI.handleError(error);
             });
-            
-            return chart;
-
-        }, function (res) {
-            var message = "Unreachable server error";
-            if (res.data.errors[0] != undefined) {
-                message = res.data.errors[0].title;
-            }
-
-            //throw new Error(message);
-        });
     };
 
     static getSongInfo = (id) => {
         let requestUrl = BASE_URL + "/songs/" + id;
 
-        return axios.get(requestUrl).then(function (res) {
+        return axios.get(requestUrl)
+            .then(function (response) {
 
-            let result = res.data.data;
+                let result = response.data.data;
 
-            let song = {
-                title: result.name,
-                artist: result.artist,
-                album: result.albumName,
-                releaseDate: result.albumRelease,
-                duration: result.duration,
-                image: result.image,
-                url: result.url
-            }
+                let song = new Song(id, result.name, result.artist,
+                    result.albumName, result.albumRelease, result.duration,
+                    result.url, result.image, null);
 
-            return song;
+                return song;
 
-        }, function (res) {
-            var message = "Unreachable server error";
-            if (res.data.errors[0] != undefined) {
-                message = res.data.errors[0].title;
-            }
-
-            //throw new Error(message);
-        });
+            })
+            .catch(function (error) {
+                MusicAPI.handleError(error);
+            });
     }
 
     static getSongRankings = (id) => {
         let requestUrl = BASE_URL + "/songs/" + id + "/ranks";
-        
-        return axios.get(requestUrl).then(function (res) {
 
-            let result = res.data.data;
+        return axios.get(requestUrl)
+            .then(function (res) {
 
-            let rankings = [];
-            
-            result.forEach((ranking) => { rankings.push(
-                { 
-                    date: ranking.endDate, 
-                    rank: ranking.rank 
-                }); 
+                let result = res.data.data;
+
+                let rankings = [];
+
+                result.forEach((ranking) => {
+                    rankings.push(new SongRank(ranking.endDate, ranking.rank));
+                });
+
+                return rankings;
+
+            })
+            .catch(function (error) {
+                MusicAPI.handleError(error);
             });
-            
-            return rankings;
-
-        }, function (res) {
-            var message = "Unreachable server error";
-            if (res.data.errors[0] != undefined) {
-                message = res.data.errors[0].title;
-            }
-
-            //throw new Error(message);
-        });
     }
 
     static getSongMedia = (id) => {
         let requestUrl = BASE_URL + "/songs/" + id + "/media?n=4";
-        
-        return axios.get(requestUrl).then(function (res) {
 
-            let result = res.data.data;
+        return axios.get(requestUrl)
+            .then(function (res) {
 
-            let media = [];
-            
-            result.forEach((mediaObject) => { media.push(
-                { 
-                    url: mediaObject.url, 
-                    title: mediaObject.caption, 
-                    type: mediaObject.mediaType, 
-                    thumbnail: mediaObject.thumbnail
-                }); 
+                let result = res.data.data;
+
+                let media = [];
+
+                result.forEach((mediaObject) => {
+                    media.push(new MediaItem(mediaObject.url, mediaObject.caption, mediaObject.mediaType, mediaObject.thumbnail));
+                });
+
+                return media;
+
+            })
+            .catch(function (error) {
+                MusicAPI.handleError(error);
             });
-            
-            return media;
-
-        }, function (res) {
-            var message = "Unreachable server error";
-            if (res.data.errors[0] != undefined) {
-                message = res.data.errors[0].title;
-            }
-
-            //throw new Error(message);
-        });
     }
 }
 
