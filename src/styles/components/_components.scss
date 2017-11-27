@@ -1,0 +1,27 @@
+.ranking-item {
+    color: black;
+}
+
+.ranking-item:hover {
+    color: $brand-color;
+    text-decoration: none;
+}
+
+.ranking-position {
+    font-size:20pt; 
+    font-weight: bold; 
+    margin-right:10px;
+}
+
+.panel-title {
+    text-align: left;
+    font-weight: bold;
+}
+
+.sm-thumb {
+    width: 245px;
+    height: 135px;
+    overflow: hidden;
+
+    display: block;
+}
