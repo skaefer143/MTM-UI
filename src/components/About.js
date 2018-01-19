@@ -1,10 +1,14 @@
 import React from 'react';
 
-const About = () => (
-  <div>
-    <h1>Contact Me</h1>
-    <p>You can reach me at test@gmail.com</p>
-  </div>
-);
-
-export default About;
+/**
+ * About component shows information about the contact information
+ */
+export default class About extends React.Component {
+  
+  render() {
+    return (
+      <div></div>
+    );
+  }
+  
+}

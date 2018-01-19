@@ -1,9 +1,17 @@
-export class MediaItem {
+/**
+ * Data object for media item
+ */
+export default class MediaItem {
 
-    constructor(url, title, type, thumbnail) {
+    constructor(url, title, thumbnail) {
         this.url = url;
         this.title = title;
-        this.type = type;
         this.thumbnail = thumbnail;
+
+        if (url.endsWith("jpg") || url.endsWith("png")) {
+            this.type = "image";
+        } else {
+            this.type = "video";
+        }
     }
 }

@@ -1,10 +1,18 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const NotFoundPage = () => (
-  <div>
-    404 - <Link to="/">Go home</Link>
-  </div>
-);
+/**
+ * NotFoundPage component shows the default message when a request cannot be routed to a component
+ */
+export default class NotFoundPage extends React.Component {
 
-export default NotFoundPage;
+  render() {
+    return (
+      <div className="container">
+        <div className="row text-center">
+          404 - <Link to="/">Go home</Link>
+        </div>
+      </div>
+    );
+  }
+}

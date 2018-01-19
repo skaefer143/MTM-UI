@@ -2,36 +2,46 @@ import React from 'react';
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import Chart from './Chart';
-import { MusicAPI } from '../api/mtm.js';
+import MusicAPI from '../api/mtm.js';
 
 import 'react-datepicker/dist/react-datepicker.css';
 
+/**
+ * HomePage component shows the date picker that renders the ordered list of songs.
+ */
 const dateFormat = "YYYY-MM-DD";
 
 export default class HomePage extends React.Component {
 
+  // Initial state
   state = {
     songs: undefined,
     date: moment('2014-02-01'),
     isLoading: false
   };
 
+  /**
+   * Retrieves a chart based on the input date
+   * @param {string} date 
+   */
   loadChart(date) {
-      MusicAPI.getChart(date).then(function (data) {
-        console.log(data);  
-        this.setState({
-              songs: data,
-              isLoading: false
-          });
-      }.bind(this), function (e) {
-          this.setState({
-          isLoading: false
-          });
+    MusicAPI.getChart(date).then(function (data) {
+      this.setState({
+        songs: data,
+        isLoading: false
+      });
+    }.bind(this), function (e) {
+      this.setState({
+        isLoading: false
+      });
 
-          alert(e.message);
-      }.bind(this));
+      alert(e.message);
+    }.bind(this));
   };
 
+  /**
+   * Handles change in date text box
+   */
   handleOnDateChange = (dateString) => {
     var newDate = moment(dateString, dateFormat);
     this.setState({
@@ -39,15 +49,18 @@ export default class HomePage extends React.Component {
     });
   };
 
+  /**
+   * Handles click on Go button
+   */
   handleGoAction = (e) => {
     e.preventDefault();
 
     this.setState({
       isLoading: true
     });
-    
+
     if (!this.state.date.isValid()) {
-      alert("Invalid date");  
+      alert("Invalid date");
       return;
     }
 
