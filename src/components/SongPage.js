@@ -22,7 +22,7 @@ export default class SongPage extends React.Component {
   };
 
   /**
-   * Load information, rankings, and media about a song when the component mounts
+   * Load information, rankings, and media about a song when thmediae component mounts
    */
   componentDidMount() {
     // Set loading flags
@@ -34,9 +34,9 @@ export default class SongPage extends React.Component {
 
     let songId = this.props.match.params.id;
 
-    //this.loadSongInfo(songId);
+    this.loadSongInfo(songId);
     this.loadSongRankings(songId);
-    //this.loadSongMedia(songId);
+    this.loadSongMedia(songId);
   };
 
   /**
