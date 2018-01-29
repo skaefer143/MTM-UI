@@ -120,22 +120,58 @@ export default class MusicAPI {
    * Get related media of a song given an id.
    */
   static getSongMedia = (id) => {
-    let requestUrl = BASE_URL + "/songs/" + id + "/media?n=4";
 
-    return axios.get(requestUrl)
-      .then(function (response) {
+    let media = [];
 
-        let result = response.data.data;
-        let media = [];
+    let BILLBOARD_URL = "http://localhost:9006/billboard/music/song/" + id;
 
-        result.forEach((mediaObj) => {
-          media.push(new MediaItem(mediaObj.url, mediaObj.caption, mediaObj.thumbnail));
-        });
+    return axios.get(BILLBOARD_URL)
+      .then(function (bill_res) {
+        let bill_result = bill_res.data.song;
 
-        return media;
+        let song_name = bill_result['song_name'];
+        let song_artist = bill_result['display_artist'];
+
+
+        let VIDEO_URL = "http://localhost:9008/imvdb/api/v1/search/videos?q=" + 
+          song_name + " " + song_artist + "&per_page=4";
+        return axios.get(VIDEO_URL)
+          .then(function (imvdb_res) {
+            let imvdb_result = imvdb_res.data.results;
+
+            imvdb_result.forEach((mediaObj) => {
+              media.push(new MediaItem(mediaObj['url'], mediaObj['song_title'], mediaObj.image['l']));
+            });
+
+            let GOOGLE_URL = "http://localhost:9009/googleapis/customsearch/v1?q=" + 
+              song_name + " " + song_artist + "&cx=001770674074172668715:am0dsqea_hey" 
+              + "&key=AIzaZyAHVa03D6aEAPH_AGR6-PJGKILKxJU-VyY"
+              + "&num=6"
+              + "&searchType=image";
+            return axios.get(GOOGLE_URL)
+              .then(function (google_res) {
+                let google_result = google_res.data.items;
+
+                google_result.forEach((mediaObj) => {
+                  media.push(new MediaItem(mediaObj['link'], mediaObj['title'], mediaObj.image['thumbnailLink']));
+                });
+
+                return media;
+              })
+            .catch(function (error) {
+              MusicAPI.handleError(error);
+            });
+            
+          })
+        .catch(function (error) {
+          MusicAPI.handleError(error);
+        }); 
+
       })
       .catch(function (error) {
         MusicAPI.handleError(error);
       });
-  }
+
+    }
+
 }
