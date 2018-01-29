@@ -51,15 +51,43 @@ export default class MusicAPI {
    * Get song information given an id
    */
   static getSongInfo = (id) => {
-    let requestUrl = BASE_URL + "/songs/" + id;
+    let BILLBOARD_URL = "http://localhost:9006/billboard/music/song/" + id;
     
-    return axios.get(requestUrl)
-      .then(function (response) {
+    return axios.get(BILLBOARD_URL)
+      .then(function (bill_response) {
 
-        let result = response.data.data;
-        let song = new Song(id, result.name, result.artist, result.album, result.releaseDate, result.duration, result.url, result.image);
+        let bill_result = bill_response.data.song;
+        let spotify_id = bill_result['spotify_id'];
 
-        return song;
+        /* Spotify Track Query */
+        let SPOTIFY_URL = "http://localhost:9007/spotify/v1/tracks/" + spotify_id;
+        return axios.get(SPOTIFY_URL)
+          .then(function (spot_response) {
+
+            let spot_result = spot_response.data;
+            let spot_album_id = spot_result.album['id'];
+            
+            /* Spotify Album Query */
+            let SPOTIFY_ALBUM_URL = "http://localhost:9007/spotify/v1/albums/" + spot_album_id;
+            return axios.get(SPOTIFY_ALBUM_URL)
+              .then(function (spot_album_response) {
+
+              let spot_album_result = spot_album_response.data;
+
+
+              let song = new Song(id, bill_result['song_name'], bill_result['display_artist'], 
+                spot_result.album['name'], spot_album_result['release_date'], 
+                spot_result['duration_ms'], spot_result.external_urls['spotify'], spot_result.album.images[0]['url']);
+              return song;
+
+            })
+            .catch(function (error) {
+              MusicAPI.handleError(error);
+            });
+        })
+        .catch(function (error) {
+          MusicAPI.handleError(error);
+        });
       })
       .catch(function (error) {
         MusicAPI.handleError(error);
